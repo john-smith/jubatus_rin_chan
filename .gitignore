@@ -1,0 +1,7 @@
+split_train
+train
+test
+*.html
+.Rhistory
+.Rproj.user
+.RData

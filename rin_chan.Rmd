@@ -1,0 +1,64 @@
+# Rin-chan Classifier
+```{r echo = F}
+library(knitr)
+library(ggplot2)
+
+rin_chan <- read.csv("test/result119.csv", header = F)
+names(rin_chan) <- c("label", "predict")
+
+rin_chan_score <- read.csv("score.csv", header = F)
+names(rin_chan_score) <- c("hoshizora", "matsuoka", "shibuya", "toosaka")
+```
+
+## Accuracy
+```{r echo = F}
+accuracy <- sprintf("%.2f%% (%d / %d)", 
+        sum(rin_chan$label == rin_chan$predict) / nrow(rin_chan) * 100, 
+        sum(rin_chan$label == rin_chan$predict),
+        nrow(rin_chan))
+```
+`r accuracy`
+
+## Confusion Maxtrix
+```{r echo = F}
+kable(table(rin_chan))
+```
+
+## PCA Plot
+```{r echo = F, warning = F}
+pca <- princomp( ~ ., data = rin_chan_score)
+pca.score <- as.data.frame(pca$scores)
+pca.score$label <- rin_chan$label
+
+ggplot(pca.score, aes(x = Comp.1, y = Comp.2, color = label)) +
+  geom_point() +
+  xlim(-5, 5) + ylim(-3, 3) +
+  xlab("") + ylab("") +
+  theme_bw()
+```
+
+## Learning Curve
+```{r echo = F}
+learning.curve <- data.frame()
+
+for(i in 0:119) {
+  rin_chan.curve <- read.csv(sprintf("test/result%03d.csv", i), header = F)
+  names(rin_chan.curve) <- c("label", "predict")
+  accuracy <- 
+    sum(rin_chan.curve$label == rin_chan.curve$predict) / nrow(rin_chan.curve)
+  learning.curve <- rbind(learning.curve, data.frame(size = (i + 1) * 10, accuracy = accuracy, type = "test"))
+}
+
+for(i in 0:119) {
+  rin_chan.curve <- read.csv(sprintf("train/result%03d.csv", i), header = F)
+  names(rin_chan.curve) <- c("label", "predict")
+  accuracy <- 
+    sum(rin_chan.curve$label == rin_chan.curve$predict) / nrow(rin_chan.curve)
+  learning.curve <- rbind(learning.curve, data.frame(size = (i + 1) * 10, accuracy = accuracy, type = "train"))
+}
+
+ggplot(learning.curve, aes(size, accuracy, color = type)) +
+  geom_line() +
+  ylim(0, 1) +
+  theme_bw()
+```
