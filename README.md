@@ -20,3 +20,8 @@
 2. RStudioでjubatus_rin_chan.Rprojを開いてknitrボタンを押す
 
 1は結構時間がかかります
+
+発表スライド
+------------
+
+[slideshare](http://www.slideshare.net/__john_smith__/5-48156536)にあります
